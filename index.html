@@ -1,0 +1,109 @@
+<html>
+    <head>
+
+    </head>
+    <body>
+        <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+        <script src="./deployed_info.js"></script>
+        <script>
+            window.onload = () => {
+                if(typeof abi === 'undefined') {
+                    document.getElementById('info').innerHTML = "[deployed_info.js]ファイルが見つかりません。確認して下さい。";
+                    return;
+                }
+                
+                window.web3 = new Web3();
+                window.web3.setProvider(new web3.providers.HttpProvider("http://localhost:7545"))
+                init();
+            }
+
+            async function init(){
+                var accounts = await window.web3.eth.getAccounts()
+                document.getElementById('livenetwork').innerHTML = deployed_network;
+                window.contract = new window.web3.eth.Contract(abi,address);
+                window.contract.methods.balanceOf(accounts[1]).call((err,res)=>{
+                    if(!err){
+                        document.getElementById('info').innerHTML = accounts[1]
+                        document.getElementById('balance').innerHTML = res
+                    }else{
+                        console.log("balanceOferr: " + err);
+                    }
+                })
+		
+            }
+
+            async function buyToken(){
+                var accounts = await window.web3.eth.getAccounts()
+                var wei = await parseInt(window.web3.utils.toWei("1", 'ether'));
+                window.web3.eth.sendTransaction({from:accounts[1],to:accounts[0], value: wei, gas:5500000}).then(()=>{
+                    window.contract.methods.BuyToken(1).send({from:accounts[1], gas:5500000}).then((res)=>{
+                        document.getElementById('p1result').innerHTML = res
+                    }).catch((err)=>{
+                        console.log("buyToken:NG" + err)
+                        document.getElementById('p1result').innerHTML = "購入に失敗しました"
+                    })
+                }).catch((err)=>{
+                    console.log("buyToken:NG" + err)
+                    document.getElementById('p1result').innerHTML = "ETHが足りません"
+                })    
+            }
+
+            async function bulkBuying(){
+                var accounts = await window.web3.eth.getAccounts()
+                var amount = document.getElementById('p2amount').value
+                var wei = parseInt(window.web3.utils.toWei(amount, 'ether'));
+                window.web3.eth.sendTransaction({from:accounts[1], to:accounts[0],value: wei, gas:5500000}).then(()=>{
+                    window.contract.methods.BuyToken(amount).send({from:accounts[1], gas:5500000}).then((res)=>{
+                        document.getElementById('p2result').innerHTML = res
+                    }).catch((err)=>{
+                        console.log("bulkBuying:NG" + err)
+                        document.getElementById('p2result').innerHTML = "購入に失敗しました"
+                    })
+                }).catch((err)=>{
+                    console.log("bulkBuying:NG" + err)
+                    document.getElementById('p1result').innerHTML = "ETHが足りません"
+                })     
+            }
+
+            async function surrenderToken(){
+                var accounts = await window.web3.eth.getAccounts()
+                var amount = await window.contract.methods.balanceOf(accounts[1]).call()
+                console.log(amount)
+                window.contract.methods.SurrenderToken(parseInt(amount)).send({from:accounts[1], gas:5500000}).then((res)=>{
+                    document.getElementById('p3result').innerHTML = res
+                }).catch((err)=>{
+                    console.log("surrenderToken:NG" + err)
+                    document.getElementById('p3result').innerHTML = "退会に失敗しました"
+                })
+            }
+        </script>
+        <main>
+            <div class="area_title">
+                <font size="+2">Membership Token</font> (Address: <span id="info"></span>
+                , 残り: <span id="balance"></span>ヵ月,ネットワーク：<span id="livenetwork"></span>)<br>
+                <a href= "contents.html" >コンテンツページ</a>
+            </div>
+            <hr>
+            <div class = "area_p1">
+                <span id="p1title"><font size="+2">◆入会する！</font></span><br><br>
+                <span>料金：1 ETH/1 カ月</span><br>
+                <input type="button" id="p1buybutton" value="入会" onclick="buyToken();"/>
+                　<font color="red"><span id="p1result"></span></font>
+            </div>
+            <hr>
+            <div class = "area_p2">
+                <span id="p2title"><font size="+2">◆まとめて購入する!</font></span><br><br>
+                <input type="number" id="p2amount">ヵ月分
+                <input type="button" id="p2buybutton" value="購入" onclick="bulkBuying();"/>
+                　<font color="red"><span id="p2result"></span></font>
+            </div>
+            <hr>
+            <div class = "area_p3">
+                <span id="p3title"><font size="+2">◆退会する</font></span><br><br>
+                <input type="button" id="p3surrenderbutton" value="退会" onclick="surrenderToken();"/>
+                　<font color="red"><span id="p3result"></span></font>
+            </div>
+        </main>
+        
+    </body>
+</html>

@@ -1,0 +1,50 @@
+<html>
+    <head></head>
+    <body>
+        <dialog id="d1_dialog">
+            <p>トークンがありません。</p>
+            <p>トークンを購入して下さい。</p>
+            <a href= "/" >購入ページ</a>
+        </dialog>
+        <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+        <script src="./deployed_info.js"></script>
+        <script>
+            window.onload = () => {
+                if(typeof abi === 'undefined') {
+                    document.getElementById('info').innerHTML = "[deployed_info.js]ファイルが見つかりません。確認して下さい。";
+                    return;
+                }
+                
+                window.web3 = new Web3();
+                window.web3.setProvider(new web3.providers.HttpProvider("http://localhost:7545"))
+                init();
+            }
+
+            async function init(){
+                window.contract = new window.web3.eth.Contract(abi,address);
+                var accounts = await window.web3.eth.getAccounts()
+                var Txid = await window.contract.methods.getLastTx().call()
+                var Tx = await window.web3.eth.getTransaction(Txid)
+                var Block = await window.web3.eth.getBlock(Tx.blockHash)
+                var Time = Block.timestamp
+                const date0 = new Date(Time * 1000);
+                const date1 = new Date()
+                const yy = date1.getFullYear()-date0.getFullYear()
+                const MM = date1.getMonth()-date0.getMonth();
+                console.log(yy)
+                console.log(MM)
+                if(yy > 0 || MM > 0){
+                    var Tx = await window.contract.methods.SurrenderToken(1).send({from:accounts[1], gas:5500000})
+                    await contract.methods.setLastTx(Tx.transactionHash).send({from:accounts[1], gas: '5000000'})
+                }
+                var balance = await window.contract.methods.balanceOf(accounts[1]).call()
+                if(balance == 0){
+                    var dialog = document.getElementById('d1_dialog');
+                    dialog.showModal();
+                }
+
+            }
+        </script>
+        <h1>hellow world</h1>
+    </body>
+</html>
