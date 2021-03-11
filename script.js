@@ -1,4 +1,5 @@
 const express = require('express');
+const { packageInit } = require('web3-core');
 const app = express();
 const http = require('http').Server(app);
 app.use("/", express.static(__dirname + '/'));
@@ -42,10 +43,12 @@ class MSToken{
 
     surrenderToken(event){
         var addr = event.returnValues._sender;
-		var value = event.returnValues._value;
-        var wei = parseInt(web3.utils.toWei(value, 'ether'));
-        console.log("[notice] SurrenderToken! (addr:" + addr + " ,value:" + value + ")");
-        web3.eth.sendTransaction({from:this.OWNER_ADDR, to:addr,value: wei, gas:5500000})           
+		var value = parseInt(event.returnValues._value)-1;
+        var wei = parseInt(web3.utils.toWei(value.toString(), 'ether'));
+        console.log("[notice] SurrenderToken! (addr:" + addr + " ,value:" + value.toString() + ")");
+        if(value>0){
+            web3.eth.sendTransaction({from:this.OWNER_ADDR, to:addr,value: wei, gas:5500000})
+        }          
     }
 }
 var v = new MSToken()

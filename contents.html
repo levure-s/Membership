@@ -1,6 +1,10 @@
 <html>
     <head></head>
     <body>
+        <dialog id="d0_dialog">
+            <p>トークンを確認しています。</p>
+            <p>少々お待ちください。</p>
+        </dialog>
         <dialog id="d1_dialog">
             <p>トークンがありません。</p>
             <p>トークンを購入して下さい。</p>
@@ -14,6 +18,8 @@
                     document.getElementById('info').innerHTML = "[deployed_info.js]ファイルが見つかりません。確認して下さい。";
                     return;
                 }
+                var dialog = document.getElementById('d0_dialog');
+                dialog.showModal();
                 
                 window.web3 = new Web3();
                 window.web3.setProvider(new web3.providers.HttpProvider("http://localhost:7545"))
@@ -24,6 +30,11 @@
                 window.contract = new window.web3.eth.Contract(abi,address);
                 var accounts = await window.web3.eth.getAccounts()
                 var Txid = await window.contract.methods.getLastTx().call()
+                if(!Txid){
+                    var dialog = document.getElementById('d1_dialog');
+                    dialog.showModal();
+                    return;
+                }
                 var Tx = await window.web3.eth.getTransaction(Txid)
                 var Block = await window.web3.eth.getBlock(Tx.blockHash)
                 var Time = Block.timestamp
@@ -41,7 +52,11 @@
                 if(balance == 0){
                     var dialog = document.getElementById('d1_dialog');
                     dialog.showModal();
+                    return;
                 }
+                var dialog = document.getElementById('d0_dialog');
+                dialog.close();
+
 
             }
         </script>
