@@ -1,0 +1,27 @@
+{
+  "name": "membership",
+  "version": "1.0.0",
+  "description": "",
+  "main": "deployed_info.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/levure-s/Membership.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/levure-s/Membership/issues"
+  },
+  "homepage": "https://github.com/levure-s/Membership#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "openzeppelin-solidity": "^2.3.0",
+    "truffle-hdwallet-provider": "^1.0.14"
+  }
+}

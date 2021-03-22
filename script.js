@@ -8,8 +8,11 @@ app.get('/', (req, res) => { res.redirect("/"); });
 
 const info = require("./deployed_info.js")
 
+const HDWalletProvider = require('truffle-hdwallet-provider');
 var web3 = new (require("web3"));
-web3.setProvider(new web3.providers.WebsocketProvider("ws://localhost:7545"));
+const INFURA_PROJECT_ID = "d11c17162d934093bf8bafa878e42df7";
+const mnemonic = "payment festival describe bird jaguar cram artwork flower video window undo join";
+web3.setProvider(new HDWalletProvider(mnemonic, `ws://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`));
 
 var contract = new web3.eth.Contract(info.abi, info.address);
 
