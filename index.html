@@ -12,18 +12,26 @@
                     return;
                 }
                 
-                window.web3 = new Web3();
-                window.web3.setProvider(new web3.providers.HttpProvider("http://localhost:7545"))
-                init();
+                if (typeof window.ethereum !== 'undefined') {
+                    ethereum.enable().then(() => {
+                        window.web3 = new Web3(window.ethereum)
+                        init(); 
+                    }).catch((err) => {
+                        document.getElementById('info').innerHTML = "MetaMaskと接続できませんでした";
+                    });
+                } else {
+                    document.getElementById('info').innerHTML = "MetaMaskが見つかりません";
+                }
+                
             }
 
             async function init(){
                 var accounts = await window.web3.eth.getAccounts()
                 document.getElementById('livenetwork').innerHTML = deployed_network;
                 window.contract = new window.web3.eth.Contract(abi,address);
-                window.contract.methods.balanceOf(accounts[1]).call((err,res)=>{
+                window.contract.methods.balanceOf(accounts[0]).call((err,res)=>{
                     if(!err){
-                        document.getElementById('info').innerHTML = accounts[1]
+                        document.getElementById('info').innerHTML = accounts[0]
                         document.getElementById('balance').innerHTML = res
                     }else{
                         console.log("balanceOferr: " + err);
@@ -35,8 +43,8 @@
             async function buyToken(){
                 var accounts = await window.web3.eth.getAccounts()
                 var wei = await parseInt(window.web3.utils.toWei("1", 'ether'));
-                window.web3.eth.sendTransaction({from:accounts[1],to:accounts[0], value: wei, gas:5500000}).then(()=>{
-                    window.contract.methods.BuyToken(1).send({from:accounts[1], gas:5500000}).then((res)=>{
+                window.web3.eth.sendTransaction({from:accounts[0],to:deploy_account, value: wei, gas:5500000}).then(()=>{
+                    window.contract.methods.BuyToken(1).send({from:accounts[0], gas:5500000}).then((res)=>{
                         document.getElementById('p1result').innerHTML = res
                         location.reload(true);
                     }).catch((err)=>{
@@ -53,8 +61,8 @@
                 var accounts = await window.web3.eth.getAccounts()
                 var amount = document.getElementById('p2amount').value
                 var wei = parseInt(window.web3.utils.toWei(amount, 'ether'));
-                window.web3.eth.sendTransaction({from:accounts[1], to:accounts[0],value: wei, gas:5500000}).then(()=>{
-                    window.contract.methods.BuyToken(amount).send({from:accounts[1], gas:5500000}).then((res)=>{
+                window.web3.eth.sendTransaction({from:accounts[0], to:deploy_account,value: wei, gas:5500000}).then(()=>{
+                    window.contract.methods.BuyToken(amount).send({from:accounts[0], gas:5500000}).then((res)=>{
                         document.getElementById('p2result').innerHTML = res
                         location.reload(true);
                     }).catch((err)=>{
@@ -69,9 +77,9 @@
 
             async function surrenderToken(){
                 var accounts = await window.web3.eth.getAccounts()
-                var amount = await window.contract.methods.balanceOf(accounts[1]).call()
+                var amount = await window.contract.methods.balanceOf(accounts[0]).call()
                 console.log(amount)
-                window.contract.methods.SurrenderToken(parseInt(amount)).send({from:accounts[1], gas:5500000}).then((res)=>{
+                window.contract.methods.SurrenderToken(parseInt(amount)).send({from:accounts[0], gas:5500000}).then((res)=>{
                     document.getElementById('p3result').innerHTML = res
                     location.reload(true);
                 }).catch((err)=>{
