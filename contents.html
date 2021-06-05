@@ -57,6 +57,7 @@
                 if(yy > 0 || MM > 0){
                     var Tx = await window.contract.methods.SurrenderToken(1).send({from:accounts[0], gas:5500000})
                     await contract.methods.setLastTx(Tx.transactionHash).send({from:accounts[0], gas: '5000000'})
+                    location.reload(true);
                 }
                 var balance = await window.contract.methods.balanceOf(accounts[0]).call()
                 if(balance == 0){

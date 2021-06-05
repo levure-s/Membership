@@ -1,6 +1,6 @@
 <html>
     <head>
-
+        <link rel="stylesheet" href="./style.css">
     </head>
     <body>
         <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
@@ -96,22 +96,22 @@
             </div>
             <hr>
             <div class = "area_p1">
-                <span id="p1title"><font size="+2">◆入会する！</font></span><br><br>
-                <span>料金：1 ETH/1 カ月</span><br>
-                <input type="button" id="p1buybutton" value="入会" onclick="buyToken();"/>
+                <span id="p1title"><font size="+2">◆入会する！</font></span>
+                <p>料金：1 ETH/1 カ月</p>
+                <input type="button" id="button" value="入会" onclick="buyToken();"/>
                 　<font color="red"><span id="p1result"></span></font>
             </div>
             <hr>
             <div class = "area_p2">
                 <span id="p2title"><font size="+2">◆まとめて購入する!</font></span><br><br>
-                <input type="number" id="p2amount" max="12" min="0">ヵ月分
-                <input type="button" id="p2buybutton" value="購入" onclick="bulkBuying();"/>
+                <input type="number" id="p2amount" max="12" min="0"><font size="+2">ヵ月分</font>
+                <input type="button" id="button" value="購入" onclick="bulkBuying();"/>
                 　<font color="red"><span id="p2result"></span></font>
             </div>
             <hr>
             <div class = "area_p3">
                 <span id="p3title"><font size="+2">◆退会する</font></span><br><br>
-                <input type="button" id="p3surrenderbutton" value="退会" onclick="surrenderToken();"/>
+                <input type="button" id="button" value="退会" onclick="surrenderToken();"/>
                 　<font color="red"><span id="p3result"></span></font>
             </div>
         </main>

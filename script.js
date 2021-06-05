@@ -7,12 +7,11 @@ app.get('/', (req, res) => { res.redirect("/"); });
 
 
 const info = require("./deployed_info.js")
+const wallet = new (require("./hdWallet.js"))
 
-const HDWalletProvider = require('truffle-hdwallet-provider');
 var web3 = new (require("web3"));
 const INFURA_PROJECT_ID = "d11c17162d934093bf8bafa878e42df7";
-const mnemonic = "payment festival describe bird jaguar cram artwork flower video window undo join";
-web3.setProvider(new HDWalletProvider(mnemonic, `ws://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`));
+web3.setProvider(new web3.providers.WebsocketProvider(`wss://rinkeby.infura.io/ws/v3/${INFURA_PROJECT_ID}`));
 
 var contract = new web3.eth.Contract(info.abi, info.address);
 
@@ -30,8 +29,8 @@ class MSToken{
     }
 
     async initGanache() {
-        this.accounts = await web3.eth.getAccounts();
-        this.OWNER_ADDR = this.accounts[0];
+        this.OWNER_ADDR = await wallet.getAccount()
+        console.log(this.OWNER_ADDR)
         return true;
     }
 
@@ -39,18 +38,17 @@ class MSToken{
         var addr = event.returnValues._sender;
 		var value = event.returnValues._value;
         console.log("[notice] BuyToken! (addr:" + addr + " ,value:" + value + ")");
-        var Tx = await contract.methods.transfer(addr,value).send({from:this.OWNER_ADDR, gas: '5000000'});
+        var Tx = await wallet.contractTransfer(addr,value)
         console.log(Tx.transactionHash);
-        contract.methods.setLastTx(Tx.transactionHash).send({from:this.OWNER_ADDR, gas: '5000000'});        
+        wallet.setLastTx(Tx.transactionHash)        
     }
 
     surrenderToken(event){
         var addr = event.returnValues._sender;
 		var value = parseInt(event.returnValues._value)-1;
-        var wei = parseInt(web3.utils.toWei(value.toString(), 'ether'));
         console.log("[notice] SurrenderToken! (addr:" + addr + " ,value:" + value.toString() + ")");
         if(value>0){
-            web3.eth.sendTransaction({from:this.OWNER_ADDR, to:addr,value: wei, gas:5500000})
+            wallet.sendTransaction(addr,value)
         }          
     }
 }
